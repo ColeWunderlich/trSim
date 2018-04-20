@@ -3,7 +3,7 @@
 \docType{class}
 \name{trModel-class}
 \alias{trModel-class}
-\title{class for experiment matrix}
+\title{Class for modeling a transmitter receiver experiment}
 \description{
-class for experiment matrix
+Class for modeling a transmitter receiver experiment
 }
