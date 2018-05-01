@@ -35,6 +35,7 @@ setMethod("calcDistances", signature(object="trModel"), function(object, diffusi
   }
   # weight = matrix(0,nrow(dist),ncol(dist)) #hack to preserve matrix shape
   object@weight[ ] = vapply(object@distance,FUN.VALUE = numeric(1),FUN=object@diffusionFn)
+  object@weight = object@weight / sum(object@weight) #normalize
 
   # object@weight = weight
 

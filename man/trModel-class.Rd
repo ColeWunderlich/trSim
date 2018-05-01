@@ -5,5 +5,5 @@
 \alias{trModel-class}
 \title{Class for modeling a transmitter receiver experiment}
 \description{
-Class for modeling a transmitter receiver experiment
+All matricies are on a reciever X transmitter basis
 }

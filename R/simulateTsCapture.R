@@ -14,6 +14,7 @@ setGeneric("simulateTsCapture",function(object,ncaptures) standardGeneric("simul
 
 setMethod("simulateTsCapture", signature(object="trModel",ncaptures="numeric"), function(object,ncaptures)
 {
-  object@reads[ ] = rmultinom(1,ncaptures,object@weight)
+  object@count[ ] = rmultinom(1,ncaptures,object@weight)
+  # object@count = matrix(rmultinom(1,ncaptures,object@weight),nrow=trm@nreceiver,ncol=object@ntransmitter)
   invisible(object)
 })
