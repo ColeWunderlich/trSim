@@ -16,6 +16,7 @@ Collate:
     'calcDistances.R'
     'plotSpace.R'
     'populateSpace.R'
+    'randomEnergy.R'
     'randomWalk.R'
     'simAnneal.R'
     'simulateTsCapture.R'
