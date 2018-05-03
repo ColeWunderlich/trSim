@@ -33,6 +33,12 @@ setMethod("simAnneal", signature(object="trModel",tstart='numeric',tstop="numeri
   t = tstart
   oldProb = 100 #dummy value
   count=0
+
+  plt = ggplot(data.frame(x=0,y=endProb),aes(x=x,y=y))+geom_point()+geom_hline(yintercept=endProb,color='red')+ylim(-10^9,endProb+10^3)+xlim(0,100)
+  show(plt)
+  # plot(0,endProb,xlim=c(0,100),ylim=c(endProb-10^7,endProb+100))
+  # abline(h=endProb,col='red')
+  xnum=2
   #note: as E decreases we move from - to 0 in log(p) space => maximize log(p)
   #since all probabilities are negative I removed the (-) from the classical e^-(dE/t) = P
   while(t>=tstop)
@@ -43,7 +49,7 @@ setMethod("simAnneal", signature(object="trModel",tstart='numeric',tstop="numeri
       warning(paste0("\nSolution reached early!\tt=",t,"\n"))
       break()
     }
-     cat("\nOldProb:\t",oldProb,"\tProb1:\t",prob1,"\n")
+    # cat("\nOldProb:\t",oldProb,"\tProb1:\t",prob1,"\n")
     if(prob1==oldProb)
     {
       count = count+1
@@ -53,6 +59,18 @@ setMethod("simAnneal", signature(object="trModel",tstart='numeric',tstop="numeri
         break()
       }
     }else {count=0}
+
+
+    cat("\n",prob1)
+    if(xnum>199)
+      plt = plt+xlim(0,xnum+100)
+    if(prob1< -10^9)
+      plt=plt+ylim(prob1-100,endProb+10^3)
+
+    plt = plt+geom_point(x=xnum,y=prob1)
+    print(plt)
+    # points(xnum,prob1,pch=20)
+    xnum = xnum+1
 
     oldProb = prob1
 
