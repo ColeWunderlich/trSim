@@ -5,7 +5,8 @@
 \alias{simAnneal,trModel,numeric,numeric-method}
 \title{Simulated Annealing}
 \usage{
-\S4method{simAnneal}{trModel,numeric,numeric}(object, tstart, tstop, alpha, n)
+\S4method{simAnneal}{trModel,numeric,numeric}(object, tstart, tstop, alpha, n,
+  endPlot = T)
 }
 \arguments{
 \item{object}{A \code{\linkS4class{trModel}} object}

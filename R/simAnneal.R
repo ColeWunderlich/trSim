@@ -9,7 +9,7 @@ setGeneric("simAnneal",function(object,tstart,tstop,...) standardGeneric("simAnn
 #'
 #' @export
 
-setMethod("simAnneal", signature(object="trModel",tstart='numeric',tstop="numeric"), function(object,tstart,tstop,alpha,n)
+setMethod("simAnneal", signature(object="trModel",tstart='numeric',tstop="numeric"), function(object,tstart,tstop,alpha,n,endPlot=T)
 {
 
   #initialize
@@ -28,32 +28,48 @@ setMethod("simAnneal", signature(object="trModel",tstart='numeric',tstop="numeri
   prob1 = sum(counts*log(w))
 
   #cheat
-  endProb = sum(counts*log(weight))
+  targetProb = sum(counts*log(weight))
 
   t = tstart
   oldProb = 100 #dummy value
   count=0
+  best = -Inf
 
-  # plt = ggplot(data.frame(x=0,y=endProb),aes(x=x,y=y))+geom_point()+geom_hline(yintercept=endProb,color='red')+ylim(-10^9,endProb+10^3)+xlim(0,100)
+  # plt = ggplot(data.frame(x=0,y=targetProb),aes(x=x,y=y))+geom_point()+geom_hline(yintercept=targetProb,color='red')+ylim(-10^9,targetProb+10^3)+xlim(0,100)
   # show(plt)
-  plot(0,endProb,xlim=c(0,100),ylim=c(endProb-10^7,endProb+100))
-  abline(h=endProb,col='red')
-  xnum=1
+  dyplot=F
+  if(dyplot)
+  {
+    flush.console()
+    plot(0,targetProb,xlim=c(0,100),ylim=c(targetProb-10^9,targetProb+100))
+    abline(h=targetProb,col='red')
+    xnum=1
+  }
+
+  if(endPlot)
+    pts = NULL
   #note: as E decreases we move from - to 0 in log(p) space => maximize log(p)
   #since all probabilities are negative I removed the (-) from the classical e^-(dE/t) = P
   while(t>=tstop)
   {
     #cheat
-    if(prob1==endProb)
+    # if(targetProb*1.1>= prob1 && prob1 >=targetProb*.90)
+    if(prob1==targetProb)
     {
       warning(paste0("\nSolution reached early!\tt=",t,"\n"))
       break()
+    }
+    if(prob1>best)
+    {
+        best=prob1
+        brrow = rrow
+        btcol = tcol
     }
     # cat("\nOldProb:\t",oldProb,"\tProb1:\t",prob1,"\n")
     if(prob1==oldProb)
     {
       count = count+1
-      if(count>100)
+      if(count>10)
       {
         warning(paste0("\nSolution stability reached at t=",t,". Terminating search.\n"))
         break()
@@ -61,15 +77,21 @@ setMethod("simAnneal", signature(object="trModel",tstart='numeric',tstop="numeri
     }else {count=0}
 
 
-    cat("\n",prob1)
-    if(xnum==100)
+    # cat("\n",prob1)
+    if(dyplot)
     {
-      plot(0,endProb,xlim=c(0,100),ylim=c(endProb-10^8,endProb+1000))
-      abline(h=endProb,col='red')
-      xnum=1
+      if(xnum==100)
+      {
+        plot(0,targetProb,xlim=c(0,100),ylim=c(targetProb-10^8,targetProb+1000))
+        abline(h=targetProb,col='red')
+        xnum=1
+      }
+      points(xnum,prob1,pch=20)
+      xnum = xnum+1
     }
-    points(xnum,prob1,pch=20)
-    xnum = xnum+1
+
+    if(endPlot)
+      pts = c(pts,prob1)
 
     oldProb = prob1
 
@@ -125,7 +147,8 @@ setMethod("simAnneal", signature(object="trModel",tstart='numeric',tstop="numeri
     }
     t = t*alpha
   }
-
-  return(list(prob=prob1,rid=rrow,tid=tcol,temp=t,weights=w))
+  if(endPlot)
+    print(qplot(1:length(pts),pts)+geom_hline(yintercept = targetProb,color='red'))
+  return(list(targetProb=targetProb,best=best,lastProb=prob1,BestVsTarg=best-targetProb,bestrid=brrow,besttid=btcol,rid=rrow,tid=tcol,temp=t,weights=w,points=pts))
 })
 
