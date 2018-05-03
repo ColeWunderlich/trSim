@@ -6,10 +6,11 @@ setGeneric("simAnneal",function(object,tstart,tstop,...) standardGeneric("simAnn
 #'@param tstop The final temperature, once the temperature drops below this value the process will stop
 #'@param alpha The multiplicitave temperature decrement
 #'@param n The number of iterations per temperature before moving to the next temperature
+#'@param stability The number of temperature increments with the same end probability that causes early termination
 #'
 #' @export
 
-setMethod("simAnneal", signature(object="trModel",tstart='numeric',tstop="numeric"), function(object,tstart,tstop,alpha,n,endPlot=T)
+setMethod("simAnneal", signature(object="trModel",tstart='numeric',tstop="numeric"), function(object,tstart,tstop,alpha,n,stability,endPlot=T)
 {
 
   #initialize
@@ -69,7 +70,7 @@ setMethod("simAnneal", signature(object="trModel",tstart='numeric',tstop="numeri
     if(prob1==oldProb)
     {
       count = count+1
-      if(count>10)
+      if(count>stability)
       {
         warning(paste0("\nSolution stability reached at t=",t,". Terminating search.\n"))
         break()
