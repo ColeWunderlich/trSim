@@ -26,8 +26,8 @@ setMethod("populateSpace",signature(object="trModel"),function(object, spaceRes=
   matx = matrix(0,nrow=spaceRes,ncol=spaceRes)
 
   #sample without replacement
-  x=sample(spaceRes,size=(object@ntransmitter+object@nreceiver))
-  y=sample(spaceRes,size=(object@ntransmitter+object@nreceiver))
+  x=sample(spaceRes,size=(object@ntransmitter+object@nreceiver),replace=T)
+  y=sample(spaceRes,size=(object@ntransmitter+object@nreceiver),replace=T)
   pts=cbind(x,y,type=c(rep(1,object@ntransmitter),rep(-1,object@nreceiver)))
   object@points=pts
 
