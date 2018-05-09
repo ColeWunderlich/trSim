@@ -10,7 +10,7 @@ setGeneric("simAnneal",function(object,tstart,tstop,...) standardGeneric("simAnn
 #'
 #' @export
 
-setMethod("simAnneal", signature(object="trModel",tstart='numeric',tstop="numeric"), function(object,tstart,tstop,alpha,n,stability,endPlot=T)
+setMethod("simAnneal", signature(object="trModel",tstart='numeric',tstop="numeric"), function(object,tstart,tstop,alpha,n,stability,endPlot=T,diagnostics=F)
 {
 
   #initialize
@@ -24,7 +24,7 @@ setMethod("simAnneal", signature(object="trModel",tstart='numeric',tstop="numeri
 
   #permute rows and cols of weight matrix to obtain random starting position
   rrow = sample(rrow)
-  tcol = sample(tcol)
+  tcol = c(1,sample(2:wcol))
   w = weight[rrow,tcol]
   prob1 = sum(counts*log(w))
 
@@ -35,17 +35,10 @@ setMethod("simAnneal", signature(object="trModel",tstart='numeric',tstop="numeri
   oldProb = 100 #dummy value
   count=0
   best = -Inf
+  oldBest = -Inf
 
   # plt = ggplot(data.frame(x=0,y=targetProb),aes(x=x,y=y))+geom_point()+geom_hline(yintercept=targetProb,color='red')+ylim(-10^9,targetProb+10^3)+xlim(0,100)
   # show(plt)
-  dyplot=F
-  if(dyplot)
-  {
-    flush.console()
-    plot(0,targetProb,xlim=c(0,100),ylim=c(targetProb-10^9,targetProb+100))
-    abline(h=targetProb,col='red')
-    xnum=1
-  }
 
   if(endPlot)
     pts = NULL
@@ -60,36 +53,16 @@ setMethod("simAnneal", signature(object="trModel",tstart='numeric',tstop="numeri
       warning(paste0("\nSolution reached early!\tt=",t,"\n"))
       break()
     }
-    if(prob1>best)
-    {
-        best=prob1
-        brrow = rrow
-        btcol = tcol
-    }
-    # cat("\nOldProb:\t",oldProb,"\tProb1:\t",prob1,"\n")
-    if(prob1==oldProb)
-    {
-      count = count+1
-      if(count>stability)
-      {
-        warning(paste0("\nSolution stability reached at t=",t,". Terminating search.\n"))
-        break()
-      }
-    }else {count=0}
 
-
-    # cat("\n",prob1)
-    if(dyplot)
-    {
-      if(xnum==100)
-      {
-        plot(0,targetProb,xlim=c(0,100),ylim=c(targetProb-10^8,targetProb+1000))
-        abline(h=targetProb,col='red')
-        xnum=1
-      }
-      points(xnum,prob1,pch=20)
-      xnum = xnum+1
-    }
+    # if(best==oldBest)
+    # {
+    #   count = count+1
+    #   if(count>stability)
+    #   {
+    #     warning(paste0("\nSolution stability reached at t=",t,". Terminating search.\n"))
+    #     break()
+    #   }
+    # }else {count=0}
 
     if(endPlot)
       pts = c(pts,prob1)
@@ -125,7 +98,7 @@ setMethod("simAnneal", signature(object="trModel",tstart='numeric',tstop="numeri
       }else
       {
         #swap a pair of cols
-        swap = sample(1:wcol,2)
+        swap = sample(2:wcol,2) #CHANGE BACK
         prob2 = prob1 - sum(counts[ ,swap]*log(w[ ,swap])) + sum(counts[ ,swap] * log(w[ ,c(swap[2],swap[1])]))
         if(prob2>prob1)
         {
@@ -145,11 +118,35 @@ setMethod("simAnneal", signature(object="trModel",tstart='numeric',tstop="numeri
           }
         }
       }
+
+      if(prob1>best)
+      {
+        oldBest = best
+        best = prob1
+        brrow = rrow
+        btcol = tcol
+      }
     }
     t = t*alpha
+
+
+    if(best==oldBest)
+    {
+      count = count+1
+      if(count>stability)
+      {
+        warning(paste0("\nSolution stability reached at t=",t,". Terminating search.\n"))
+        break()
+      }
+    }else {count=0}
+
+    if(diagnostics)
+      cat(sprintf("\nBest:\t%.5f\toldBest:\t%.5f\tCount:\t%d\n",best,oldBest,count))
+
+    oldBest = best
   }
   if(endPlot)
     print(qplot(1:length(pts),pts)+geom_hline(yintercept = targetProb,color='red'))
-  return(list(targetProb=targetProb,best=best,lastProb=prob1,BestVsTarg=best-targetProb,bestrid=brrow,besttid=btcol,rid=rrow,tid=tcol,temp=t,weights=w,points=pts))
+  return(list(targetProb=targetProb,best=best,lastProb=prob1,BestVsTarg=paste0((best-targetProb)/targetProb,"% TargetProb"),bestrid=brrow,besttid=btcol,rid=rrow,tid=tcol,temp=t,weights=w,points=pts))
 })
 

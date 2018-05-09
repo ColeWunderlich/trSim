@@ -6,7 +6,7 @@
 \title{Simulated Annealing}
 \usage{
 \S4method{simAnneal}{trModel,numeric,numeric}(object, tstart, tstop, alpha, n,
-  endPlot = T)
+  stability, endPlot = T, diagnostics = F)
 }
 \arguments{
 \item{object}{A \code{\linkS4class{trModel}} object}
@@ -18,6 +18,8 @@
 \item{alpha}{The multiplicitave temperature decrement}
 
 \item{n}{The number of iterations per temperature before moving to the next temperature}
+
+\item{stability}{The number of temperature increments with the same end probability that causes early termination}
 }
 \description{
 Simulated Annealing
