@@ -147,6 +147,6 @@ setMethod("simAnneal", signature(object="trModel",tstart='numeric',tstop="numeri
   }
   if(endPlot)
     print(qplot(1:length(pts),pts)+geom_hline(yintercept = targetProb,color='red'))
-  return(list(targetProb=targetProb,best=best,lastProb=prob1,BestVsTarg=paste0((best-targetProb)/targetProb,"% TargetProb"),bestrid=brrow,besttid=btcol,rid=rrow,tid=tcol,temp=t,weights=w,points=pts))
+  return(list(targetProb=targetProb,best=best,lastProb=prob1,BestVsTarg=paste0((best-targetProb)/targetProb," % TargetProb"),bestrid=brrow,besttid=btcol,rid=rrow,tid=tcol,temp=t,weights=w,points=pts))
 })
 
