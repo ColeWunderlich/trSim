@@ -24,7 +24,8 @@ setMethod("simAnneal", signature(object="trModel",tstart='numeric',tstop="numeri
 
   #permute rows and cols of weight matrix to obtain random starting position
   rrow = sample(rrow)
-  tcol = c(1,sample(2:wcol))
+  # tcol = c(1,sample(2:wcol))
+  tcol = sample(tcol)
   w = weight[rrow,tcol]
   prob1 = sum(counts*log(w))
 
@@ -98,7 +99,8 @@ setMethod("simAnneal", signature(object="trModel",tstart='numeric',tstop="numeri
       }else
       {
         #swap a pair of cols
-        swap = sample(2:wcol,2) #CHANGE BACK
+        # swap = sample(2:wcol,2) #CHANGE BACK
+        swap = sample(1:wcol,2)
         prob2 = prob1 - sum(counts[ ,swap]*log(w[ ,swap])) + sum(counts[ ,swap] * log(w[ ,c(swap[2],swap[1])]))
         if(prob2>prob1)
         {
@@ -146,7 +148,7 @@ setMethod("simAnneal", signature(object="trModel",tstart='numeric',tstop="numeri
     oldBest = best
   }
   if(endPlot)
-    print(qplot(1:length(pts),pts)+geom_hline(yintercept = targetProb,color='red'))
+    print(qplot(1:length(pts),pts)+geom_hline(yintercept = targetProb,color='red')+geom_point(aes(x=length(pts)+1,y=best),color="green"))
   return(list(targetProb=targetProb,best=best,lastProb=prob1,BestVsTarg=paste0((best-targetProb)/targetProb," % TargetProb"),bestrid=brrow,besttid=btcol,rid=rrow,tid=tcol,temp=t,weights=w,points=pts))
 })
 
