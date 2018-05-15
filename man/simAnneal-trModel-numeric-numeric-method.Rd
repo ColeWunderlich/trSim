@@ -6,7 +6,7 @@
 \title{Simulated Annealing}
 \usage{
 \S4method{simAnneal}{trModel,numeric,numeric}(object, tstart, tstop, alpha, n,
-  stability, endPlot = T, diagnostics = F)
+  stability, endPlot = T, diagnostics = F, cluster = F)
 }
 \arguments{
 \item{object}{A \code{\linkS4class{trModel}} object}
@@ -19,8 +19,14 @@
 
 \item{n}{The number of iterations per temperature before moving to the next temperature}
 
-\item{stability}{The number of temperature increments with the same end probability that causes early termination}
+\item{stability}{The number of temperature increments with the same end probability that causes early termination. If \code{0}
+stability checking will not be performed.}
 }
 \description{
-Simulated Annealing
+Plot info: Red line is optimal solution.  Green point is the best solution reached over the entire run, always plotted as the
+last point regardless of when the best solution was actually reached.  Each point plotted is the probability at the end of a
+given temperature state.
+}
+\details{
+Stability based on best solution reached and checked after each temperature state.
 }

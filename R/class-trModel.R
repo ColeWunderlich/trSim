@@ -1,8 +1,8 @@
 #' Class for modeling a transmitter receiver experiment
 #'
 #'All matricies are on a reciever X transmitter basis
+#' import mvtnorm
 #' @import ggplot2
-#' @import mvtnorm
 #' @exportClass trModel
 
 ##Notes:

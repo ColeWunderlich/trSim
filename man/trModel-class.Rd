@@ -6,4 +6,5 @@
 \title{Class for modeling a transmitter receiver experiment}
 \description{
 All matricies are on a reciever X transmitter basis
+import mvtnorm
 }

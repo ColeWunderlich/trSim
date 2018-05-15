@@ -2,6 +2,8 @@
 
 export(bob)
 export(calcTstart)
+export(startLog)
+export(stopLog)
 export(trModel)
 exportClasses(TestClass)
 exportClasses(trModel)
@@ -13,4 +15,3 @@ exportMethods(randomEnergy)
 exportMethods(simAnneal)
 exportMethods(simulateTsCapture)
 import(ggplot2)
-import(mvtnorm)

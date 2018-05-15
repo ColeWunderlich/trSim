@@ -1,16 +1,23 @@
 setGeneric("simAnneal",function(object,tstart,tstop,...) standardGeneric("simAnneal"))
 #' Simulated Annealing
 #'
+#'Plot info: Red line is optimal solution.  Green point is the best solution reached over the entire run, always plotted as the
+#'last point regardless of when the best solution was actually reached.  Each point plotted is the probability at the end of a
+#'given temperature state.
+#'
+#'Stability based on best solution reached and checked after each temperature state.
+#'
 #'@param object A \code{\linkS4class{trModel}} object
 #'@param tstart The starting temperature
 #'@param tstop The final temperature, once the temperature drops below this value the process will stop
 #'@param alpha The multiplicitave temperature decrement
 #'@param n The number of iterations per temperature before moving to the next temperature
-#'@param stability The number of temperature increments with the same end probability that causes early termination
+#'@param stability The number of temperature increments with the same end probability that causes early termination. If \code{0}
+#'stability checking will not be performed.
 #'
 #' @export
 
-setMethod("simAnneal", signature(object="trModel",tstart='numeric',tstop="numeric"), function(object,tstart,tstop,alpha,n,stability,endPlot=T,diagnostics=F)
+setMethod("simAnneal", signature(object="trModel",tstart='numeric',tstop="numeric"), function(object,tstart,tstop,alpha,n,stability,endPlot=T,diagnostics=F,cluster=F)
 {
 
   #initialize
@@ -38,8 +45,6 @@ setMethod("simAnneal", signature(object="trModel",tstart='numeric',tstop="numeri
   best = -Inf
   oldBest = -Inf
 
-  # plt = ggplot(data.frame(x=0,y=targetProb),aes(x=x,y=y))+geom_point()+geom_hline(yintercept=targetProb,color='red')+ylim(-10^9,targetProb+10^3)+xlim(0,100)
-  # show(plt)
 
   if(endPlot)
     pts = NULL
@@ -54,16 +59,6 @@ setMethod("simAnneal", signature(object="trModel",tstart='numeric',tstop="numeri
       warning(paste0("\nSolution reached early!\tt=",t,"\n"))
       break()
     }
-
-    # if(best==oldBest)
-    # {
-    #   count = count+1
-    #   if(count>stability)
-    #   {
-    #     warning(paste0("\nSolution stability reached at t=",t,". Terminating search.\n"))
-    #     break()
-    #   }
-    # }else {count=0}
 
     if(endPlot)
       pts = c(pts,prob1)
@@ -132,7 +127,7 @@ setMethod("simAnneal", signature(object="trModel",tstart='numeric',tstop="numeri
     t = t*alpha
 
 
-    if(best==oldBest)
+    if(best==oldBest & stability!=0)
     {
       count = count+1
       if(count>stability)
@@ -149,6 +144,13 @@ setMethod("simAnneal", signature(object="trModel",tstart='numeric',tstop="numeri
   }
   if(endPlot)
     print(qplot(1:length(pts),pts)+geom_hline(yintercept = targetProb,color='red')+geom_point(aes(x=length(pts)+1,y=best),color="green"))
-  return(list(targetProb=targetProb,best=best,lastProb=prob1,BestVsTarg=paste0((best-targetProb)/targetProb," % TargetProb"),bestrid=brrow,besttid=btcol,rid=rrow,tid=tcol,temp=t,weights=w,points=pts))
+  if(cluster)
+  {
+    return((best-targetProb)/targetProb*100)
+  }
+  else
+  {
+    return(list(targetProb=targetProb,best=best,lastProb=prob1,BestVsTarg=paste0((best-targetProb)/targetProb*100," % TargetProb"),bestrid=brrow,besttid=btcol,rid=rrow,tid=tcol,temp=t,weights=w,points=pts))
+  }
 })
 
